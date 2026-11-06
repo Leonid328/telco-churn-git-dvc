@@ -1,0 +1,7 @@
+generate:
+  samples: 800
+  seed: 42
+train:
+  C: 1.0
+  max_iter: 200
+  seed: 42

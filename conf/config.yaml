@@ -1,0 +1,15 @@
+defaults:
+  - model: logreg
+
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: .
+  sweep:
+    dir: multirun/${hydra.job.num}
+  output_subdir: null
