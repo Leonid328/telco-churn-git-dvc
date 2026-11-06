@@ -1,4 +1,4 @@
-# Telco Churn — Git, DVC, Hydra
+# Telco Churn: Git, DVC, Hydra
 
 The dataset generator follows the deployed [telco-churn-synthetic](https://github.com/Leonid328/telco-churn-synthetic) project. This repository repeats the case-study workflow for Git and DVC, then runs the same trainer through Hydra.
 
