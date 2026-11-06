@@ -1,5 +1,5 @@
 generate:
-  samples: 800
+  samples: 1200
   seed: 42
 train:
   C: 1.0
