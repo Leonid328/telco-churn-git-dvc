@@ -70,4 +70,16 @@ python src/train_hydra.py --multirun model.C=0.1,1.0
 
 The sweep prints one JSON line per job. Default `model.C=1.0` on 1200 rows: accuracy 0.6833, ROC-AUC 0.7151.
 
-Screenshots of the terminal session are in `proof/`.
+## Screenshots
+
+![screenshot](proof/case-study-01.png)
+![screenshot](proof/case-study-02.png)
+![screenshot](proof/case-study-03.png)
+![screenshot](proof/case-study-04.png)
+![screenshot](proof/case-study-05.png)
+![screenshot](proof/case-study-06.png)
+![screenshot](proof/case-study-07.png)
+![screenshot](proof/case-study-08.png)
+![screenshot](proof/case-study-09.png)
+![screenshot](proof/case-study-10.png)
+![screenshot](proof/case-study-11.png)
