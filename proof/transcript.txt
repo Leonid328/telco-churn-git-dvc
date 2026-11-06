@@ -1,0 +1,439 @@
+A  .gitignore
+A  conf/config.yaml
+A  conf/model/logreg.yaml
+A  dvc.yaml
+A  params.yaml
+A  requirements.txt
+A  src/generate.py
+A  src/prepare.py
+A  src/train.py
+A  src/train_hydra.py
+?? proof/
+[main (root-commit) 5f2b9a2] Add Telco Churn code before data is tracked
+ 10 files changed, 346 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 conf/config.yaml
+ create mode 100644 conf/model/logreg.yaml
+ create mode 100644 dvc.yaml
+ create mode 100644 params.yaml
+ create mode 100644 requirements.txt
+ create mode 100644 src/generate.py
+ create mode 100644 src/prepare.py
+ create mode 100644 src/train.py
+ create mode 100644 src/train_hydra.py
+$ python src/generate.py
+wrote 800 rows to /Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/data/raw/telco_churn.csv
+
+$ wc -l data/raw/telco_churn.csv
+     801 data/raw/telco_churn.csv
+
+$ dvc init
+Initialized DVC repository.
+
+You can now commit the changes to git.
+
++---------------------------------------------------------------------+
+|                                                                     |
+|        DVC has enabled anonymous aggregate usage analytics.         |
+|     Read the analytics documentation (and how to opt-out) here:     |
+|             <https://dvc.org/doc/user-guide/analytics>              |
+|                                                                     |
++---------------------------------------------------------------------+
+
+What's next?
+------------
+- Check out the documentation: <https://dvc.org/doc>
+- Get help and share ideas: <https://dvc.org/chat>
+- Star us on GitHub: <https://github.com/treeverse/dvc>
+
+[main 1cdfe48] Initialize DVC
+ 3 files changed, 6 insertions(+)
+ create mode 100644 .dvc/.gitignore
+ create mode 100644 .dvc/config
+ create mode 100644 .dvcignore
+$ dvc add data/raw/telco_churn.csv
+
+To track the changes with git, run:
+
+	git add data/raw/.gitignore data/raw/telco_churn.csv.dvc
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+
+[main 3556e24] Track the telco dataset with DVC
+ 2 files changed, 6 insertions(+)
+ create mode 100644 data/raw/.gitignore
+ create mode 100644 data/raw/telco_churn.csv.dvc
+$ dvc remote add -d localstore /tmp/telco-dvc-storage
+Setting 'localstore' as a default remote.
+
+[main 4d98e0e] Configure the local DVC remote
+ 1 file changed, 4 insertions(+)
+$ dvc push
+1 file pushed
+
+$ python src/generate.py
+wrote 1200 rows to /Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/data/raw/telco_churn.csv
+
+$ wc -l data/raw/telco_churn.csv
+    1201 data/raw/telco_churn.csv
+
+$ dvc add data/raw/telco_churn.csv
+
+To track the changes with git, run:
+
+	git add data/raw/telco_churn.csv.dvc
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+
+[main e3b9586] Update the tracked dataset to 1200 rows
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+$ dvc push
+1 file pushed
+
+$ git checkout HEAD~1 -- data/raw/telco_churn.csv.dvc && dvc checkout
+WARNING: No file hash info found for '/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/models/model.joblib'. It won't be created.
+WARNING: No file hash info found for '/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/data/prepared/features.csv'. It won't be created.
+M       data/raw/telco_churn.csv
+ERROR: Checkout failed for following targets:
+data/prepared/features.csv
+models/model.joblib
+Is your cache up to date?
+<https://error.dvc.org/missing-files>
+$ wc -l data/raw/telco_churn.csv   # after checkout of the previous .dvc
+     801 data/raw/telco_churn.csv
+
+$ git checkout HEAD -- data/raw/telco_churn.csv.dvc && dvc checkout data/raw/telco_churn.csv
+ERROR: unexpected error - unable to open database file
+
+Having any troubles? Hit us up at https://dvc.org/support, we are always happy to help!
+$ git checkout HEAD -- data/raw/telco_churn.csv.dvc && dvc checkout data/raw/telco_churn.csv
+M       data/raw/telco_churn.csv
+    1201 data/raw/telco_churn.csv
+
+$ dvc repro
+'data/raw/telco_churn.csv.dvc' didn't change, skipping
+Running stage 'prepare':
+> python src/prepare.py
+wrote 1200 x 31 to /Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/data/prepared/features.csv
+Generating lock file 'dvc.lock'
+Updating lock file 'dvc.lock'
+
+Running stage 'train':
+> python src/train.py
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 200 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=200).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+{"model": "logreg", "C": 1.0, "accuracy": 0.6792, "roc_auc": 0.7071, "rows": 1200}
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add models/.gitignore data/prepared/.gitignore dvc.lock
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.
+
+[main 585de63] Add the prepare and train pipeline
+ 4 files changed, 52 insertions(+)
+ create mode 100644 data/prepared/.gitignore
+ create mode 100644 dvc.lock
+ create mode 100644 metrics/metrics.json
+ create mode 100644 models/.gitignore
+$ dvc metrics show
+Path                  C    accuracy    model    roc_auc    rows
+metrics/metrics.json  1.0  0.6792      logreg   0.7071     1200
+
+$ dvc dag
++------------------------------+ 
+| data/raw/telco_churn.csv.dvc | 
++------------------------------+ 
+                *                
+                *                
+                *                
+          +---------+            
+          | prepare |            
+          +---------+            
+                *                
+                *                
+                *                
+            +-------+            
+            | train |            
+            +-------+            
+
+$ dvc repro
+'data/raw/telco_churn.csv.dvc' didn't change, skipping
+Stage 'prepare' didn't change, skipping
+Running stage 'train':
+> python src/train.py
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 200 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=200).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+{"model": "logreg", "C": 0.1, "accuracy": 0.6708, "roc_auc": 0.7039, "rows": 1200}
+Updating lock file 'dvc.lock'
+
+To track the changes with git, run:
+
+	git add dvc.lock
+
+To enable auto staging, run:
+
+	dvc config core.autostage true
+Use `dvc push` to send your updates to remote storage.
+
+$ dvc params diff HEAD
+Path         Param    HEAD    workspace
+params.yaml  train.C  1.0     0.1
+
+$ dvc metrics diff HEAD
+Path                  Metric    HEAD    workspace    Change
+metrics/metrics.json  C         1.0     0.1          -0.9
+metrics/metrics.json  accuracy  0.6792  0.6708       -0.0084
+metrics/metrics.json  roc_auc   0.7071  0.7039       -0.0032
+
+[main b7bc9f5] Retune logistic regression and compare DVC metrics
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+$ git log --oneline
+b7bc9f5 Retune logistic regression and compare DVC metrics
+585de63 Add the prepare and train pipeline
+e3b9586 Update the tracked dataset to 1200 rows
+4d98e0e Configure the local DVC remote
+3556e24 Track the telco dataset with DVC
+1cdfe48 Initialize DVC
+5f2b9a2 Add Telco Churn code before data is tracked
+
+$ python src/train_hydra.py
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/defaults_list.py:251: UserWarning: In 'config': Defaults list is missing `_self_`. See https://hydra.cc/docs/1.2/upgrades/1.0_to_1.1/default_composition_order for more information
+  warnings.warn(msg, UserWarning)
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 200 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=200).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 1.0
+  max_iter: 200
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 1.0, "accuracy": 0.6792, "roc_auc": 0.7071, "rows": 1200}
+
+$ python src/train_hydra.py model.C=0.5
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/defaults_list.py:251: UserWarning: In 'config': Defaults list is missing `_self_`. See https://hydra.cc/docs/1.2/upgrades/1.0_to_1.1/default_composition_order for more information
+  warnings.warn(msg, UserWarning)
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 200 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=200).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 0.5
+  max_iter: 200
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 0.5, "accuracy": 0.6792, "roc_auc": 0.7057, "rows": 1200}
+
+$ python src/train_hydra.py --multirun model.C=0.1,1.0
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/defaults_list.py:251: UserWarning: In 'config': Defaults list is missing `_self_`. See https://hydra.cc/docs/1.2/upgrades/1.0_to_1.1/default_composition_order for more information
+  warnings.warn(msg, UserWarning)
+Traceback (most recent call last):
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
+    return func()
+           ^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/utils.py", line 466, in <lambda>
+    lambda: hydra.multirun(
+            ^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/hydra.py", line 162, in multirun
+    ret = sweeper.sweep(arguments=task_overrides)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/hydra/_internal/core_plugins/basic_sweeper.py", line 162, in sweep
+    sweep_dir = Path(self.config.hydra.sweep.dir)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 359, in __getattr__
+    self._format_and_raise(key=key, value=None, cause=e)
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 231, in _format_and_raise
+    format_and_raise(
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/_utils.py", line 899, in format_and_raise
+    _raise(ex, cause)
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/_utils.py", line 797, in _raise
+    raise ex.with_traceback(sys.exc_info()[2])  # set env var OC_CAUSE=1 for full trace
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 351, in __getattr__
+    return self._get_impl(
+           ^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/dictconfig.py", line 451, in _get_impl
+    return self._resolve_with_default(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/basecontainer.py", line 98, in _resolve_with_default
+    resolved_node = self._maybe_resolve_interpolation(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 719, in _maybe_resolve_interpolation
+    return self._resolve_interpolation_from_parse_tree(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 584, in _resolve_interpolation_from_parse_tree
+    resolved = self.resolve_parse_tree(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 764, in resolve_parse_tree
+    return visitor.visit(parse_tree)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/antlr4/tree/Tree.py", line 34, in visit
+    return tree.accept(self)
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar/gen/OmegaConfGrammarParser.py", line 206, in accept
+    return visitor.visitConfigValue(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar_visitor.py", line 101, in visitConfigValue
+    return self.visit(ctx.getChild(0))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/antlr4/tree/Tree.py", line 34, in visit
+    return tree.accept(self)
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar/gen/OmegaConfGrammarParser.py", line 342, in accept
+    return visitor.visitText(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar_visitor.py", line 301, in visitText
+    return self._unescape(list(ctx.getChildren()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar_visitor.py", line 389, in _unescape
+    text = str(self.visitInterpolation(node))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar_visitor.py", line 125, in visitInterpolation
+    return self.visit(ctx.getChild(0))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/antlr4/tree/Tree.py", line 34, in visit
+    return tree.accept(self)
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar/gen/OmegaConfGrammarParser.py", line 921, in accept
+    return visitor.visitInterpolationNode(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/grammar_visitor.py", line 158, in visitInterpolationNode
+    return self.node_interpolation_callback(inter_key, self.memo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 745, in node_interpolation_callback
+    return self._resolve_node_interpolation(inter_key=inter_key, memo=memo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 671, in _resolve_node_interpolation
+    raise InterpolationToMissingValueError(
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 664, in _resolve_node_interpolation
+    parent, last_key, value = root_node._select_impl(
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/base.py", line 514, in _select_impl
+    value, _ = _select_one(
+               ^^^^^^^^^^^^
+  File "/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/omegaconf/omegaconf.py", line 1150, in _select_one
+    raise MissingMandatoryValue(
+omegaconf.errors.InterpolationToMissingValueError: MissingMandatoryValue while resolving interpolation: Missing mandatory value: hydra.job.num
+    full_key: hydra.sweep.dir
+    reference_type=SweepDir
+    object_type=SweepDir
+$ python src/train_hydra.py
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 1.0
+  max_iter: 1000
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 1.0, "accuracy": 0.6833, "roc_auc": 0.7151, "rows": 1200}
+
+$ python src/train_hydra.py model.C=0.5
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 0.5
+  max_iter: 1000
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 0.5, "accuracy": 0.6792, "roc_auc": 0.7136, "rows": 1200}
+
+$ python src/train_hydra.py --multirun model.C=0.1,1.0
+[2026-11-06 16:37:48,438][HYDRA] Launching 2 jobs locally
+[2026-11-06 16:37:48,438][HYDRA] 	#0 : model.C=0.1
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 0.1
+  max_iter: 1000
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 0.1, "accuracy": 0.6708, "roc_auc": 0.7112, "rows": 1200}
+[2026-11-06 16:37:49,323][HYDRA] 	#1 : model.C=1.0
+/Users/leonidbondarenko/golearning/homework/telco-churn-git-dvc/.venv/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:599: ConvergenceWarning: lbfgs failed to converge after 1000 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=1000).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+Please also refer to the documentation for alternative solver options:
+    https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+  n_iter_i = _check_optimize_result(
+model:
+  name: logreg
+  C: 1.0
+  max_iter: 1000
+seed: 42
+data:
+  features: data/prepared/features.csv
+
+{"model": "logreg", "C": 1.0, "accuracy": 0.6833, "roc_auc": 0.7151, "rows": 1200}
+

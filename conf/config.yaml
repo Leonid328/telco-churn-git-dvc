@@ -1,5 +1,6 @@
 defaults:
   - model: logreg
+  - _self_
 
 seed: 42
 data:
@@ -10,6 +11,4 @@ hydra:
     chdir: false
   run:
     dir: .
-  sweep:
-    dir: multirun/${hydra.job.num}
   output_subdir: null

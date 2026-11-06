@@ -1,0 +1,7 @@
+{
+  "model": "logreg",
+  "C": 1.0,
+  "accuracy": 0.6833,
+  "roc_auc": 0.7151,
+  "rows": 1200
+}
