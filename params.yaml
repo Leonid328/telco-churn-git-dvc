@@ -2,6 +2,6 @@ generate:
   samples: 1200
   seed: 42
 train:
-  C: 1.0
+  C: 0.1
   max_iter: 200
   seed: 42

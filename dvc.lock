@@ -29,15 +29,15 @@ stages:
       size: 1828
     params:
       params.yaml:
-        train.C: 1.0
+        train.C: 0.1
         train.max_iter: 200
         train.seed: 42
     outs:
     - path: metrics/metrics.json
       hash: md5
-      md5: cdd51ee26014439c9c3a85742298e3b2
+      md5: 90998f868978d37c51e97d9bacf4994f
       size: 95
     - path: models/model.joblib
       hash: md5
-      md5: 8c62d51bae6538e48f5acdb5f7a4e2fb
+      md5: 9df54ba9214578932f47e17c1827f34c
       size: 2079
