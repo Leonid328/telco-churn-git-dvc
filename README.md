@@ -80,6 +80,3 @@ The sweep prints one JSON line per job. Default `model.C=1.0` on 1200 rows: accu
 ![screenshot](proof/case-study-06.png)
 ![screenshot](proof/case-study-07.png)
 ![screenshot](proof/case-study-08.png)
-![screenshot](proof/case-study-09.png)
-![screenshot](proof/case-study-10.png)
-![screenshot](proof/case-study-11.png)
